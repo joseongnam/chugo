@@ -1,0 +1,88 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+div {
+  box-sizing: border-box;
+}
+
+li {
+  list-style: none;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.top-banner {
+  display: flex;
+  width: 100vw;
+  height: 40px;
+  background-color: blue;
+  color: white;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-banner a {
+  color: white;
+}
+
+.up-nav {
+  display: flex;
+  width: 100vw;
+  height: 80px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 150px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 30px;
+  flex: 1;
+  justify-content: center;
+}
+
+.middle-nav {
+  flex: 2;
+}
+
+.middle-nav ul {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  justify-content: center;
+}
+
+.middle-nav li {
+  font-size: 16px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  color: rgb(108, 108, 108);
+}
+
+.right-nav {
+  flex: 1;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  justify-content: right;
+  font-size: 14px;
+  font-weight: bold;
+  color: rgb(108, 108, 108);
+}
+
+.right-nav a {
+  display: flex;
+  align-items: center;
+}
