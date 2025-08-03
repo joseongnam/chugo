@@ -12,8 +12,8 @@ export default function ProductNew() {
       <div className="card shadow">
         <div className="card-body">
           <h5 className="card-title">상품 등록</h5>
-          {on ? (
-            <form>
+          <div className={`formdata ${on ? "show" : ""}`}>
+          <form>
               <div className="row">
                 <div className="col-md-6 mb-3">
                   <label className="form-label">상품이름</label>
@@ -102,11 +102,12 @@ export default function ProductNew() {
                 </button>
               </div>
             </form>
-          ) : (
-            <button className="btn btn-primary" onClick={() => setOn(true)}>
+            </div>
+
+            <button className={`${on?"hidden":"btn btn-primary"}`} onClick={() => setOn(true)}>
               + 새 상품 등록
             </button>
-          )}
+
         </div>
       </div>
     </div>
