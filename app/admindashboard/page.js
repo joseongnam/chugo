@@ -1,4 +1,4 @@
-import { connectDB } from "@/utill/database";
+import connectDB  from "@/util/database";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AdManagement from "./AdManagement";
 import ProductManagement from "./ProductManagement";

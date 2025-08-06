@@ -9,10 +9,13 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.859.0",
     "bootstrap": "^5.3.7",
     "bootstrap-icons": "^1.13.1",
+    "formidable": "^3.5.4",
     "mongo": "^0.1.0",
     "mongodb": "^6.18.0",
+    "multiparty": "^4.2.3",
     "next": "15.4.5",
     "react": "19.1.0",
     "react-dom": "19.1.0"
