@@ -1,7 +1,7 @@
 "use client";
 
 export default function Card({ title, content, price, discount, imageUrl }) {
-  let discountPrice = price * (discount / 100);
+  let discountPrice = price * (1 - discount / 100);
   return (
     <div className="product-card">
       <img src={imageUrl} alt="상품이미지" />

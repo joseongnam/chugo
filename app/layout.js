@@ -1,19 +1,9 @@
+import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import 'bootstrap-icons/font/bootstrap-icons.css';
-import { Geist, Geist_Mono } from "next/font/google";
 import EndContainer from "./EndContainer";
 import "./globals.css";
 import UpContainer from "./UpContainer";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import Script from "next/script";
 
 export const metadata = {
   title: "Create Next App",
@@ -21,12 +11,17 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
+
   return (
     <html lang="en">
+      <head>
+        <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
+        
+      </head>
       <body>
-        <UpContainer />
+        <UpContainer/>
         {children}
-        <EndContainer />
+        <EndContainer/>
       </body>
     </html>
   );

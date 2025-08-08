@@ -1,3 +1,5 @@
+'use client';
+
 export default function UpContainer() {
   return (
     <div style={{ borderBottom: "1px solid #eee" }}>
@@ -16,8 +18,8 @@ export default function UpContainer() {
           </ul>
         </div>
         <div className="right-nav">
-          <a href="/">로그인</a>
-          <a href="/">회원가입</a>
+          <a href="/login">로그인</a>
+          <a href="/join">회원가입</a>
           <a href="/">
             <i className="bi bi-search"></i>
           </a>
