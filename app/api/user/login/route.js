@@ -31,13 +31,21 @@ export async function POST(request) {
       id: user.id,
       email: user.email,
       name: user.name,
+      isAdmin: user.isAdmin
     },
     process.env.JWT_SECRET, // 환경 변수에 꼭 저장!
     {
       expiresIn: "1d", // 7일간 유지
     }
   );
-       const response = NextResponse.json({ message: "로그인 성공" });
+       const response = NextResponse.json({ message: "로그인 성공" ,
+        user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      isAdmin: user.isAdmin,
+    }},
+        );
   response.cookies.set({
     name: "token",
     value: token,

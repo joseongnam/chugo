@@ -1,9 +1,9 @@
 import "bootstrap-icons/font/bootstrap-icons.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import EndContainer from "./EndContainer";
 import "./globals.css";
+import Providers from "./Providers";
 import UpContainer from "./UpContainer";
-import Script from "next/script";
+import { UserProvider } from "./UserContext";
 
 export const metadata = {
   title: "Create Next App",
@@ -11,17 +11,15 @@ export const metadata = {
 };
 
 export default function RootLayout({ children }) {
-
   return (
     <html lang="en">
-      <head>
-        <Script src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js" strategy="beforeInteractive" />
-        
-      </head>
       <body>
-        <UpContainer/>
-        {children}
-        <EndContainer/>
+        <UserProvider>
+          <Providers>
+            <UpContainer />
+            {children}
+          </Providers>
+        </UserProvider>
       </body>
     </html>
   );

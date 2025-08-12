@@ -60,6 +60,7 @@ export async function POST(request) {
       yymmdd: yymmdd,
       zipcode: zipcode,
       address: address,
+      isAdmin: "false",
       createdAt: new Date(),
     });
 
