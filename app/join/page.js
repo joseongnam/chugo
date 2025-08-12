@@ -1,6 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { signIn } from "next-auth/react";
 
 export default function Join() {
   const router = useRouter();
@@ -178,10 +179,10 @@ export default function Join() {
     <div className="login-container">
       <div className="login-box">
         <h2 className="login-title">회원가입</h2>
-        <button className="kakao-login">카카오 로그인</button>
-        <button className="social-button naver">네이버 로그인</button>
+        <button className="kakao-login" onClick={() => signIn("kakao", { callbackUrl: "/" })}>카카오 로그인</button>
+        <button className="social-button naver" onClick={() => signIn("naver", { callbackUrl: "/" })}>네이버 로그인</button>
         <button className="social-button facebook">Facebook으로 로그인</button>
-        <button className="social-button google">
+        <button className="social-button google" onClick={() => signIn("google", { callbackUrl: "/" })}>
           <img src="https://www.google.com/favicon.ico" alt="Google" />
           Google 로그인
         </button>

@@ -13,6 +13,34 @@ export default function Login() {
   const router = useRouter();
   const { setUser } = useUser();
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const loginData = {
+      email: email,
+      password: password,
+    };
+    try {
+      const response = await fetch("/api/user/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(loginData),
+        credentials: "include",
+      });
+      const result = await response.json();
+      if (response.ok) {
+        alert(result.message);
+        setUser(result.user);
+        router.push("/");
+      } else {
+        alert(result.message);
+      }
+    } catch (e) {
+      alert("회원가입 정보가 없습니다" + e.message);
+    }
+  };
+
   return (
     <div className="login-container">
       <div className="login-box">
@@ -46,73 +74,45 @@ export default function Login() {
           <button className="tab-button tab-active">기존 회원</button>
           <button className="tab-button tab-inactive">비회원 배송조회</button>
         </div>
+        <form onSubmit={handleSubmit}>
+          <input
+            className="login-input"
+            type="text"
+            placeholder="아이디 또는 이메일"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="login-input"
+            type={showPassword ? "text" : "password"}
+            placeholder="비밀번호"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
 
-        <input
-          className="login-input"
-          type="text"
-          placeholder="아이디 또는 이메일"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <input
-          className="login-input"
-          type={showPassword ? "text" : "password"}
-          placeholder="비밀번호"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <div className="options">
+            <label>
+              <input
+                type="checkbox"
+                checked={saveId}
+                onChange={() => setSaveId(!saveId)}
+              />
+              아이디 저장
+            </label>
+            <label>
+              <input
+                type="checkbox"
+                checked={showPassword}
+                onChange={() => setShowPassword(!showPassword)}
+              />
+              보안접속
+            </label>
+          </div>
 
-        <div className="options">
-          <label>
-            <input
-              type="checkbox"
-              checked={saveId}
-              onChange={() => setSaveId(!saveId)}
-            />
-            아이디 저장
-          </label>
-          <label>
-            <input
-              type="checkbox"
-              checked={showPassword}
-              onChange={() => setShowPassword(!showPassword)}
-            />
-            보안접속
-          </label>
-        </div>
-
-        <button
-          className="login-button"
-          onClick={async (e) => {
-            e.preventDefault();
-            const loginData = {
-              email: email,
-              password: password,
-            };
-            try {
-              const response = await fetch("/api/user/login", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify(loginData),
-                credentials: "include",
-              });
-              const result = await response.json();
-              if (response.ok) {
-                alert(result.message);
-                setUser(result.user);
-                router.push("/");
-              } else {
-                alert(result.message);
-              }
-            } catch (e) {
-              alert("회원가입 정보가 없습니다" + e.message);
-            }
-          }}
-        >
-          로그인
-        </button>
+          <button className="login-button" type="submit">
+            로그인
+          </button>
+        </form>
 
         <div className="links">
           <button>아이디 찾기</button> | <button>비밀번호 찾기</button> |{" "}
@@ -132,8 +132,11 @@ export default function Login() {
           네이버 로그인
         </button>
         <button className="social-button facebook">Facebook으로 로그인</button>
-        <button className="social-button google" onClick={() => signIn("google", { callbackUrl: "/" })}>
-          <img src="https://www.google.com/favicon.ico" alt="Google"  />
+        <button
+          className="social-button google"
+          onClick={() => signIn("google", { callbackUrl: "/" })}
+        >
+          <img src="https://www.google.com/favicon.ico" alt="Google" />
           Google 로그인
         </button>
       </div>
