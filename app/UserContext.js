@@ -2,18 +2,27 @@
 
 import { createContext, useContext, useState, useEffect } from "react";
 
-// Context 생성
 const UserContext = createContext();
 
-// Provider 컴포넌트
 export function UserProvider({ children }) {
   const [user, setUser] = useState(null);
 
+  // 마운트 시 서버 세션 확인
   useEffect(() => {
-    fetch("/api/user/me", { credentials: "include" })
-      .then((res) => (res.ok ? res.json() : Promise.reject()))
-      .then((data) => setUser(data.user))
-      .catch(() => setUser(null));
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user/me", { credentials: "include" });
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+        } else {
+          setUser(null);
+        }
+      } catch {
+        setUser(null);
+      }
+    };
+    fetchUser();
   }, []);
 
   return (
@@ -23,7 +32,6 @@ export function UserProvider({ children }) {
   );
 }
 
-// 커스텀 훅
 export function useUser() {
   return useContext(UserContext);
 }

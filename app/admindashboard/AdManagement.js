@@ -47,9 +47,12 @@ export default function AdManagement() {
 
                 <div className="col-md-6 mb-3">
                   <label className="form-label">연결제품선택</label>
-                  <input type="text" className="form-control" name="productId" />
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="productId"
+                  />
                 </div>
-
 
                 {/* 이미지 URL 입력 */}
                 <div className="col-md-6 mb-3">
@@ -99,6 +102,11 @@ export default function AdManagement() {
                 <button type="submit" className="btn btn-primary">
                   등록
                 </button>
+                <button type="submit" className="btn btn-outline-secondary">
+                  수정
+                </button>
+                <button className="btn btn-outline-danger">삭제</button>
+
                 <button
                   type="button"
                   className="btn btn-outline-danger"
@@ -109,15 +117,12 @@ export default function AdManagement() {
               </div>
             </form>
           </div>
-
           <button
             className={`${on ? "hidden" : "btn btn-primary"}`}
             onClick={() => setOn(true)}
           >
             + 등록
           </button>
-          <button className="btn btn-outline-secondary">수정</button>
-          <button className="btn btn-outline-danger">삭제</button>
         </div>
       </div>
     </div>

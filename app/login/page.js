@@ -13,6 +13,10 @@ export default function Login() {
   const router = useRouter();
   const { setUser } = useUser();
 
+    const handleSocialLogin = (provider) => {
+    signIn(provider, { callbackUrl: "/" });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loginData = {
@@ -65,7 +69,7 @@ export default function Login() {
 
         <button
           className="kakao-login"
-          onClick={() => signIn("kakao", { callbackUrl: "/" })}
+          onClick={() => handleSocialLogin("kakao")}
         >
           카카오 1초 로그인/회원가입
         </button>
@@ -127,14 +131,14 @@ export default function Login() {
 
         <button
           className="social-button naver"
-          onClick={() => signIn("naver", { callbackUrl: "/" })}
+          onClick={() => handleSocialLogin("naver")}
         >
           네이버 로그인
         </button>
         <button className="social-button facebook">Facebook으로 로그인</button>
         <button
           className="social-button google"
-          onClick={() => signIn("google", { callbackUrl: "/" })}
+          onClick={() => handleSocialLogin("google")}
         >
           <img src="https://www.google.com/favicon.ico" alt="Google" />
           Google 로그인

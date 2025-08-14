@@ -31,14 +31,51 @@ export default function UpContainer() {
   };
 
   const handleLogout = async () => {
-    const res = await fetch("/api/user/logout", {
-      method: "POST",
-      credentials: "include",
-    });
-    if (res.ok) {
-      setUser(null); // 전역 상태 업데이트
-      signOut({ callbackUrl: "/" });
-      window.location.reload();
+    try {
+      const currentUser = user;
+
+      // 소셜 로그인인 경우
+      if (
+        currentUser?.provider === "kakao" ||
+        currentUser?.provider === "naver" ||
+        currentUser?.provider === "google"
+      ) {
+        // NextAuth.js의 세션을 먼저 종료
+        await signOut({ redirect: false });
+        setUser(null);
+
+        // 각 소셜 서비스별 로그아웃 URL로 리디렉션
+        if (currentUser.provider === "kakao") {
+          const KAKAO_REST_KEY = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+          window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_REST_KEY}&logout_redirect_uri=${encodeURIComponent(
+            window.location.origin
+          )}`;
+        } else if (currentUser.provider === "naver") {
+          window.location.href =
+            "https://nid.naver.com/nidlogin.logout?returl=" +
+            encodeURIComponent(window.location.origin);
+        } else if (currentUser.provider === "google") {
+          window.location.href =
+            "https://accounts.google.com/Logout?continue=" +
+            encodeURIComponent(window.location.origin);
+        }
+      } else {
+        // 일반 로그인(JWT)인 경우
+        await signOut({ redirect: false });
+        setUser(null);
+
+        const res = await fetch("/api/user/logout", {
+          method: "POST",
+          credentials: "include",
+        });
+        if (!res.ok) {
+          console.error("서버 로그아웃 실패");
+          return;
+        }
+        window.location.href = "/";
+      }
+    } catch (error) {
+      console.error("로그아웃 실패:", error);
     }
   };
 

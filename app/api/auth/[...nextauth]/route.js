@@ -1,8 +1,8 @@
 import connectDB from "@/util/database";
 import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
-import GoogleProvider from "next-auth/providers/google";
 
 export const authOptions = {
   providers: [
@@ -14,6 +14,7 @@ export const authOptions = {
       authorization: {
         url: "https://kauth.kakao.com/oauth/authorize",
         params: { scope: "profile_nickname profile_image account_email" },
+        prompt: "select_account",
       },
       profile(profile) {
         return {
@@ -31,7 +32,11 @@ export const authOptions = {
       clientSecret: process.env.NAVER_CLIENT_SECRET || "",
       authorization: {
         url: "https://nid.naver.com/oauth2.0/authorize",
-        params: { response_type: "code", scope: "name email profile_image" },
+        params: {
+          response_type: "code",
+          scope: "name email profile_image",
+          auth_type: "reauthenticate",
+        },
       },
       profile(profile) {
         const res = profile.response;
@@ -44,9 +49,18 @@ export const authOptions = {
       },
     }),
     GoogleProvider({
-  clientId: process.env.GOOGLE_CLIENT_ID,
-  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-})
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      authorization: {
+        params: {
+          // 구글은 prompt=login이 아니라 select_account/consent 사용
+          prompt: "select_account",
+          // 필요시 offline/consent도 추가 가능
+          // access_type: "offline",
+          // include_granted_scopes: true,
+        },
+      },
+    }),
   ],
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
@@ -88,7 +102,6 @@ export const authOptions = {
               },
             }
           );
-
         }
         return true; // 로그인 계속 진행
       } catch (error) {
