@@ -55,6 +55,7 @@ export async function POST(request) {
         httpOnly: true, // JavaScript에서 접근 불가
         //process.env.NODE_ENV === "production",//
         secure: false,
+        sameSite: "lax", //sameSite: "strict" 실제배포시
         maxAge: 60 * 60 * 24 * 7, // 7일
         path: "/",
       });
