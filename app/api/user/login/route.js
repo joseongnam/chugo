@@ -58,7 +58,6 @@ export async function POST(request) {
         sameSite: "lax", //sameSite: "strict" 실제배포시
         maxAge: 60 * 60 * 24 * 7, // 7일
         path: "/",
-        domain: "whtjdska-server.mooo.com",
       });
 
       return response;
