@@ -2,6 +2,7 @@ import connectDB from "@/util/database";
 import AdSlider from "./AdSlider";
 import AllProducts from "./AllProducts";
 
+
 export default async function home() {
   let db = (await connectDB).db("chugo");
   let adRaw = await db.collection("ad").find().toArray();

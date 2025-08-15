@@ -1,4 +1,4 @@
-import connectDB  from "@/util/database";
+import connectDB from "@/util/database";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AdManagement from "./AdManagement";
 import ProductManagement from "./ProductManagement";
@@ -10,7 +10,7 @@ export default async function AdminDashboard() {
   let products = await db.collection("products").find().toArray();
 
   return (
-    <div className="container py-5 bg-light min-vh-100">
+    <div className="container py-5 bg-white min-vh-100">
       <div className="row g-4">
         {/* 상품 등록 */}
         <ProductNew />

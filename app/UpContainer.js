@@ -47,8 +47,9 @@ export default function UpContainer() {
         // 각 소셜 서비스별 로그아웃 URL로 리디렉션
         if (currentUser.provider === "kakao") {
           const KAKAO_REST_KEY = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID;
+          const logoutRedirectUri = `${window.location.origin}/logged-out`; // 로그아웃 완료 후 이동할 페이지
           window.location.href = `https://kauth.kakao.com/oauth/logout?client_id=${KAKAO_REST_KEY}&logout_redirect_uri=${encodeURIComponent(
-            window.location.origin
+            logoutRedirectUri
           )}`;
         } else if (currentUser.provider === "naver") {
           window.location.href =
@@ -85,7 +86,9 @@ export default function UpContainer() {
         <a href="/">이달의 리뷰왕</a>
       </div>
       <div className="up-nav">
-        <div className="logo">CHUGO</div>
+        <div className="logo" onClick={() => router.push("/")}>
+          CHUGO
+        </div>
         <div className="middle-nav">
           <ul>
             <li>요고특가</li>

@@ -23,6 +23,7 @@ export default async function AllProducts() {
               price={item.price}
               discount={item.discount}
               imageUrl={item.imageUrl}
+              id={item._id}
             />
           );
         })}

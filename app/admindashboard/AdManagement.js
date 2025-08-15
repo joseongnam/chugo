@@ -36,7 +36,7 @@ export default function AdManagement() {
     <div className="col-md-12">
       <div className="card shadow">
         <div className="card-body">
-          <h5 className="card-title">광고 관리</h5>
+          <h5 className="card-title">슬라이드 광고 관리</h5>
           <div className={`formdata ${on ? "show" : ""}`}>
             <form className="productNewForm" onSubmit={handleSubmit}>
               <div className="row">

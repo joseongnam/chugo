@@ -1,9 +1,20 @@
 "use client";
 
-export default function Card({ title, content, price, discount, imageUrl }) {
+import { useRouter } from "next/navigation";
+
+export default function Card({
+  title,
+  content,
+  price,
+  discount,
+  imageUrl,
+  id,
+}) {
   let discountPrice = price * (1 - discount / 100);
+  const router = useRouter();
+
   return (
-    <div className="product-card">
+    <div className="product-card" onClick={() => router.push(`/detail/${id}`)}>
       <img src={imageUrl} alt="상품이미지" />
       <h4>제목 : {title}</h4>
       <p>설명 : {content}</p>

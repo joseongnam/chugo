@@ -53,6 +53,9 @@ export default function Join() {
       },
     }).open();
   };
+   const handleSocialLogin = (provider) => {
+    signIn(provider, { callbackUrl: "/" });
+  };
 
   const validatePassword = (pw) => {
     const lengthValid = pw.length >= 10 && pw.length <= 16;
@@ -179,10 +182,10 @@ export default function Join() {
     <div className="login-container">
       <div className="login-box">
         <h2 className="login-title">회원가입</h2>
-        <button className="kakao-login" onClick={() => signIn("kakao", { callbackUrl: "/" })}>카카오 로그인</button>
-        <button className="social-button naver" onClick={() => signIn("naver", { callbackUrl: "/" })}>네이버 로그인</button>
-        <button className="social-button facebook">Facebook으로 로그인</button>
-        <button className="social-button google" onClick={() => signIn("google", { callbackUrl: "/" })}>
+        <button className="kakao-login" onClick={() => handleSocialLogin("kakao")}>카카오 로그인</button>
+        <button className="social-button naver" onClick={() => handleSocialLogin("naver")}>네이버 로그인</button>
+        <button className="social-button facebook" >Facebook으로 로그인</button>
+        <button className="social-button google" onClick={() => handleSocialLogin("google")}>
           <img src="https://www.google.com/favicon.ico" alt="Google" />
           Google 로그인
         </button>

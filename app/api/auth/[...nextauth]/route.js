@@ -13,8 +13,9 @@ export const authOptions = {
       clientSecret: process.env.KAKAO_CLIENT_SECRET || "",
       authorization: {
         url: "https://kauth.kakao.com/oauth/authorize",
-        params: { scope: "profile_nickname profile_image account_email" },
-        prompt: "select_account",
+        params: { scope: "profile_nickname profile_image account_email",
+          prompt: "login",
+         },
       },
       profile(profile) {
         return {
