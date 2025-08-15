@@ -1,6 +1,6 @@
 import connectDB from "@/util/database";
 
-export async function GET(request) {
+export async function GET() {
   try {
     const db = (await connectDB).db("chugo");
     const result = await db.collection("products").find().toArray();
