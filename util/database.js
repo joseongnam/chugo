@@ -1,6 +1,10 @@
 import { MongoClient } from "mongodb";
 const uri = process.env.MONGOURL;
-const options = { useNewUrlParser: true };
+const options = {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  tlsAllowInvalidCertificates: true,
+};
 let connectDB;
 
 if (process.env.NODE_ENV === "development") {
