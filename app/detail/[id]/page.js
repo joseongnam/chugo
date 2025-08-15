@@ -33,7 +33,7 @@ export default async function Detail({ params }) {
             {/* 상품 타이틀 */}
             <div className="mb-1">
               <h5 className="text-warning mb-1">⭐ 4.9 | 리뷰 140건</h5>
-              <h2 className="fw-bold">과일</h2>
+              <h2 className="fw-bold">{product.tilte}</h2>
             </div>
 
             {/* 설명 */}
@@ -49,10 +49,14 @@ export default async function Detail({ params }) {
             {/* 가격 */}
             <div className="d-flex align-items-center mb-3">
               <span className="text-muted text-decoration-line-through me-2 fs-5">
-                21,000원
+                {product.price}원
               </span>
-              <span className="text-danger fw-bold me-2 fs-4">10%</span>
-              <span className="fw-bold fs-4">2,100원</span>
+              <span className="text-danger fw-bold me-2 fs-4">
+                {product.discount}%
+              </span>
+              <span className="fw-bold fs-4">
+                {product.price - (product.price * product.discount) / 100}원
+              </span>
             </div>
 
             {/* 혜택 배너 */}
