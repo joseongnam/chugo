@@ -36,7 +36,7 @@ export default function Login() {
       if (response.ok) {
         alert(result.message);
         setUser(result.user);
-        router.push("/");
+        setTimeout(() => router.push("/"), 300);
       } else {
         alert(result.message);
       }

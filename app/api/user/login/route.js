@@ -56,9 +56,8 @@ export async function POST(request) {
         //process.env.NODE_ENV === "production",//
         secure: false,
         sameSite: "lax", //sameSite: "strict" 실제배포시
-        maxAge: 60 * 60 * 24 * 7, // 7일
+        maxAge: 60 * 60, // 1시간
         path: "/",
-        domain: "whtjdska20-server.mooo.com",
       });
 
       return response;
