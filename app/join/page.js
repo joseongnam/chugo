@@ -1,7 +1,8 @@
 "use client";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Script from "next/script";
+import { useState } from "react";
 
 export default function Join() {
   const router = useRouter();
@@ -36,24 +37,28 @@ export default function Join() {
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
   const openDaumPostcode = () => {
-    new window.daum.Postcode({
-      oncomplete: function (data) {
-        let addr = data.address; // 기본 주소
-        let extra = "";
+    if (typeof window !== "undefined" && window.daum && window.daum.Postcode) {
+      new window.daum.Postcode({
+        oncomplete: function (data) {
+          let addr = data.address;
+          let extra = "";
 
-        if (data.addressType === "R") {
-          if (data.bname) extra += data.bname;
-          if (data.buildingName)
-            extra += extra ? `, ${data.buildingName}` : data.buildingName;
-          if (extra) addr += ` (${extra})`;
-        }
+          if (data.addressType === "R") {
+            if (data.bname) extra += data.bname;
+            if (data.buildingName)
+              extra += extra ? `, ${data.buildingName}` : data.buildingName;
+            if (extra) addr += ` (${extra})`;
+          }
 
-        setFullAddress(addr);
-        setZipcode(data.zonecode);
-      },
-    }).open();
+          setFullAddress(addr);
+          setZipcode(data.zonecode);
+        },
+      }).open();
+    } else {
+      console.log("다음 우편번호 스크립트 로드 대기 중...");
+    }
   };
-   const handleSocialLogin = (provider) => {
+  const handleSocialLogin = (provider) => {
     signIn(provider, { callbackUrl: "/" });
   };
 
@@ -182,10 +187,23 @@ export default function Join() {
     <div className="login-container">
       <div className="login-box">
         <h2 className="login-title">회원가입</h2>
-        <button className="kakao-login" onClick={() => handleSocialLogin("kakao")}>카카오 로그인</button>
-        <button className="social-button naver" onClick={() => handleSocialLogin("naver")}>네이버 로그인</button>
-        <button className="social-button facebook" >Facebook으로 로그인</button>
-        <button className="social-button google" onClick={() => handleSocialLogin("google")}>
+        <button
+          className="kakao-login"
+          onClick={() => handleSocialLogin("kakao")}
+        >
+          카카오 로그인
+        </button>
+        <button
+          className="social-button naver"
+          onClick={() => handleSocialLogin("naver")}
+        >
+          네이버 로그인
+        </button>
+        <button className="social-button facebook">Facebook으로 로그인</button>
+        <button
+          className="social-button google"
+          onClick={() => handleSocialLogin("google")}
+        >
           <img src="https://www.google.com/favicon.ico" alt="Google" />
           Google 로그인
         </button>
@@ -308,7 +326,10 @@ export default function Join() {
               </select>
             </div>
           </div>
-
+          <Script
+            src="https://t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"
+            strategy="beforeInteractive" // 페이지 렌더 전에 로드
+          />
           <div className="form-group">
             <label>주소</label>
             <div className="address-row">
