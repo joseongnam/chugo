@@ -10,6 +10,7 @@ export default async function AllProducts() {
     productId: item.productId?.toString?.() ?? null,
     createdAt: item.createdAt?.toString?.(),
   }));
+  console.log(products.length);
 
   return (
     <div className="sale-products">
