@@ -60,20 +60,19 @@ export async function POST(request) {
       !fields.category ||
       !fields.status ||
       !fields.discount ||
-      !fields.tag ||
-      !file[0]
+      !fields.tag
     ) {
       return NextResponse.json({ error: "입력값 부족" }, { status: 400 });
     }
 
-    const fileContent = fs.readFileSync(file[0].filepath);
+    const fileContent = fs.readFileSync(file.filepath);
     const uploadKey = `products/${Date.now()}_${file.originalFilename}`;
 
     const uploadCommand = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
       Key: uploadKey,
       Body: fileContent,
-      ContentType: file[0].mimetype,
+      ContentType: file.mimetype,
     });
 
     const s3Result = await s3.send(uploadCommand);
@@ -90,8 +89,8 @@ export async function POST(request) {
       content: getSingleValue(fields.content),
       price: parseFloat(fields.price),
       inventory: parseInt(fields.inventory),
-      category: getSingleValue(fields.status),
-      status: fields.status?.[0],
+      category: fields.category,
+      status: fields.status,
       discount: parseFloat(fields.discount),
       tag: tag,
       imageUrl,
