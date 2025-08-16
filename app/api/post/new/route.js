@@ -2,6 +2,7 @@ import connectDB from "@/util/database";
 import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { Formidable } from "formidable";
 import fs from "fs";
+import { NextResponse } from "next/server";
 import { Readable } from "stream";
 
 export const config = {
@@ -42,12 +43,14 @@ export async function POST(request) {
     });
   });
 
-  const getSingleValue = (val) => Array.isArray(val) ? val[0] : val;
+  const getSingleValue = (val) => (Array.isArray(val) ? val[0] : val);
 
   try {
     const { fields, files } = data;
-    const file = files.image;
-
+    const file = Array.isArray(files.image) ? files.image[0] : files.image;
+    if (!file) {
+      return NextResponse.json({ error: "이미지 파일 필요" }, { status: 400 });
+    }
 
     if (
       !fields.title ||
@@ -60,12 +63,11 @@ export async function POST(request) {
       !fields.tag ||
       !file[0]
     ) {
-      return new Response(JSON.stringify({ error: "입력값 부족" }), {
-        status: 400,
-      });
+      return NextResponse.json({ error: "입력값 부족" }, { status: 400 });
     }
 
     const fileContent = fs.readFileSync(file[0].filepath);
+    const uploadKey = `products/${Date.now()}_${file.originalFilename}`;
 
     const uploadCommand = new PutObjectCommand({
       Bucket: process.env.AWS_S3_BUCKET_NAME,
@@ -74,13 +76,13 @@ export async function POST(request) {
       ContentType: file[0].mimetype,
     });
 
-   const s3Result = await s3.send(uploadCommand);
+    const s3Result = await s3.send(uploadCommand);
     const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${uploadKey}`;
 
     const tag = (Array.isArray(fields.tag) ? fields.tag[0] : fields.tag)
-  .split(',')
-  .map(tag => tag.trim())
-  .filter(tag => tag.length > 0);
+      .split(",")
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
 
     const db = (await connectDB).db("chugo");
     const result = await db.collection("products").insertOne({
@@ -96,17 +98,14 @@ export async function POST(request) {
       createdAt: new Date(),
     });
 
-    return new Response(
-      JSON.stringify({ message: "상품 등록 완료", title: result.title }),
+    return NextResponse.json(
+      { message: "상품 등록 완료", title: result.title },
       {
         status: 200,
-        headers: { "Content-Type": "application/json" },
       }
     );
   } catch (err) {
     console.error("업로드 실패", err);
-    return new Response(JSON.stringify({ error: "서버 오류 발생" }), {
-      status: 500,
-    });
+    return NextResponse.json({ error: "서버 오류 발생" }, { status: 500 });
   }
 }
