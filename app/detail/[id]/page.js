@@ -1,11 +1,20 @@
 import connectDB from "@/util/database";
 import { ObjectId } from "mongodb";
+import DetailBtn from "./DetailBtn";
+import ProductInfo from "./ProductInfo";
 
 export default async function Detail({ params }) {
+  const { id } = await params;
   const db = (await connectDB).db("chugo");
-  const product = await db
+  const productRaw = await db
     .collection("products")
-    .findOne({ _id: new ObjectId(params) });
+    .findOne({ _id: new ObjectId(id) });
+  const product = {
+    ...productRaw,
+    _id: productRaw._id.toString(),
+    createdAt: productRaw.createdAt ? productRaw.createdAt.toISOString() : null,
+    updatedAt: productRaw.updatedAt ? productRaw.updatedAt.toISOString() : null,
+  };
   return (
     <div className="detail">
       <div className="location">
@@ -70,7 +79,11 @@ export default async function Detail({ params }) {
             </div>
 
             {/* 옵션 */}
-            <div className="accordion" id="productOptions">
+            <div
+              className="accordion"
+              id="productOptions"
+              style={{ display: "none" }}
+            >
               <div className="accordion-item">
                 <h2 className="accordion-header" id="headingOne">
                   <button
@@ -92,15 +105,15 @@ export default async function Detail({ params }) {
                 >
                   <div className="accordion-body">
                     <ul className="list-unstyled">
-                      <li className="mb-3">
+                      <li className="mb-2">
                         <strong>[SET 1]</strong> 제로사과 1개 + 제로바나나 1개
                         <span className="float-end fw-bold">58,100원</span>
                       </li>
-                      <li className="mb-3">
+                      <li className="mb-2">
                         <strong>[SET 2]</strong> 제로사과 2개 + 제로바나나 2개
                         <span className="float-end fw-bold">107,800원</span>
                       </li>
-                      <li>
+                      <li className="mb-2">
                         <strong>[SET 3]</strong> 제로사과 3개 + 제로바나나 3개
                         엘라 제로 3개
                         <span className="float-end fw-bold">157,500원</span>
@@ -110,84 +123,11 @@ export default async function Detail({ params }) {
                 </div>
               </div>
             </div>
+            <DetailBtn id={id} />
           </div>
         </div>
       </div>
-      <div className="product-info">
-        <ul className="nav nav-tabs" id="myTab" role="tablist">
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link active"
-              id="home-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#home-tab-pane"
-              type="button"
-              role="tab"
-              aria-controls="home-tab-pane"
-              aria-selected="true"
-            >
-              상세정보
-            </button>
-          </li>
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link"
-              id="profile-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#profile-tab-pane"
-              type="button"
-              role="tab"
-              aria-controls="profile-tab-pane"
-              aria-selected="false"
-            >
-              반품/교환정보
-            </button>
-          </li>
-          <li className="nav-item" role="presentation">
-            <button
-              className="nav-link"
-              id="contact-tab"
-              data-bs-toggle="tab"
-              data-bs-target="#contact-tab-pane"
-              type="button"
-              role="tab"
-              aria-controls="contact-tab-pane"
-              aria-selected="false"
-            >
-              리뷰
-            </button>
-          </li>
-        </ul>
-        <div className="tab-content" id="myTabContent">
-          <div
-            className="tab-pane fade show active"
-            id="home-tab-pane"
-            role="tabpanel"
-            aria-labelledby="home-tab"
-            tabIndex={0}
-          >
-            안녕하세요, {product.title}입니다.
-          </div>
-          <div
-            className="tab-pane fade"
-            id="profile-tab-pane"
-            role="tabpanel"
-            aria-labelledby="profile-tab"
-            tabIndex={0}
-          >
-            반품/교환정보
-          </div>
-          <div
-            className="tab-pane fade"
-            id="contact-tab-pane"
-            role="tabpanel"
-            aria-labelledby="contact-tab"
-            tabIndex={0}
-          >
-            리뷰탭
-          </div>
-        </div>
-      </div>
+      <ProductInfo product={product} />
     </div>
   );
 }

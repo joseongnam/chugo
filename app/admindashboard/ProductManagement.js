@@ -41,6 +41,7 @@ export default function ProductManagement() {
     setStatus(item.status);
     setDiscount(item.discount);
     setTag(item.tag);
+    setImageUrl(item.imageUrl || "");
   };
 
   const handleDelete = (id) => {
@@ -220,7 +221,7 @@ export default function ProductManagement() {
                               <input
                                 type="text"
                                 className="form-control"
-                                value={item.imageUrl}
+                                value={imageUrl}
                                 onChange={(e) => setImageUrl(e.target.value)}
                                 placeholder="이미지 주소 직접 입력 가능"
                               />
@@ -235,9 +236,9 @@ export default function ProductManagement() {
                                 className="border p-2 text-center"
                                 style={{ minHeight: "150px" }}
                               >
-                                {item.imageUrl ? (
+                                {imageUrl ? (
                                   <img
-                                    src={item.imageUrl}
+                                    src={imageUrl}
                                     alt="미리보기"
                                     style={{
                                       maxWidth: "100%",

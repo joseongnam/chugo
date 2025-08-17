@@ -7,8 +7,8 @@ export default async function AllProducts() {
   const products = productsRaw.map((item) => ({
     ...item,
     _id: item._id.toString(),
-    productId: item.productId?.toString?.() ?? null,
-    createdAt: item.createdAt?.toString?.(),
+    createdAt: item.createdAt ? item.createdAt.toISOString() : null,
+    updatedAt: item.updatedAt ? item.updatedAt.toISOString() : null,
   }));
   console.log(products.length);
 

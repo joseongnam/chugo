@@ -14,7 +14,7 @@ export default async function AdminDashboard() {
   let db = (await connectDB).db("chugo");
   let products = await db.collection("products").find().toArray();
 
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
 
   if (!token) {

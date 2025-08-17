@@ -1,5 +1,5 @@
 import connectDB from "@/util/database";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand, S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { Formidable } from "formidable";
 import fs from "fs";
 import { ObjectId } from "mongodb";
@@ -23,7 +23,7 @@ const s3 = new S3Client({
 
 // POST 핸들러 (App Router 방식)
 export async function PUT(req, { params }) {
-  const { id } = params;
+  const { id } = await params;
   const db = (await connectDB).db("chugo");
   const product = await db
     .collection("products")
@@ -36,22 +36,11 @@ export async function PUT(req, { params }) {
     );
   }
 
-  const deleteKey = product.imageUrl.replace(
-    `https://${process.env.AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/`,
-    ""
-  );
-  const deleteCommand = new DeleteObjectCommand({
-    Bucket: process.env.AWS_S3_BUCKET_NAME,
-    Key: deleteKey, // 업로드할 때 사용한 uploadKey와 동일해야 함
-  });
-  const deleteS3result = await s3.send(deleteCommand);
-
-  const form = new Formidable({ multiples: false }); // ✅ 최신 버전 방식
-
-  const buffer = Buffer.from(await request.arrayBuffer());
+  const form = new Formidable({ multiples: false });
+  const buffer = Buffer.from(await req.arrayBuffer());
 
   const headers = {};
-  request.headers.forEach((value, key) => {
+  req.headers.forEach((value, key) => {
     headers[key.toLowerCase()] = value;
   });
 
@@ -60,22 +49,18 @@ export async function PUT(req, { params }) {
   stream.method = "PUT";
   stream.url = `/api/PUT/${id}`;
 
-  const data = await new Promise((resolve, reject) => {
-    form.parse(stream, (err, fields, files) => {
-      if (err) reject(err);
-      else resolve({ fields, files });
-    });
-  });
-
-  const getSingleValue = (val) => (Array.isArray(val) ? val[0] : val);
-
   try {
-    const { fields, files } = data;
-    const file = Array.isArray(files.image) ? files.image[0] : files.image;
-    if (!file) {
-      return NextResponse.json({ error: "이미지 파일 필요" }, { status: 400 });
-    }
+    const data = await new Promise((resolve, reject) => {
+      form.parse(stream, (err, fields, files) => {
+        if (err) reject(err);
+        else resolve({ fields, files });
+      });
+    });
 
+    const getSingleValue = (val) => (Array.isArray(val) ? val[0] : val);
+    const { fields, files } = data;
+
+    // 유효성 체크
     if (
       !fields.title ||
       !fields.content ||
@@ -89,25 +74,48 @@ export async function PUT(req, { params }) {
       return NextResponse.json({ error: "입력값 부족" }, { status: 400 });
     }
 
-    const fileContent = fs.readFileSync(file.filepath);
-    const uploadKey = `products/${Date.now()}_${file.originalFilename}`;
+    let imageUrl = product.imageUrl;
+    const file = Array.isArray(files.image) ? files.image[0] : files.image;
 
-    const uploadCommand = new PutObjectCommand({
-      Bucket: process.env.AWS_S3_BUCKET_NAME,
-      Key: uploadKey,
-      Body: fileContent,
-      ContentType: file.mimetype,
-    });
+    // 파일 새로 올린 경우에만 업로드 + 기존 삭제
+    if (file) {
+      const fileContent = fs.readFileSync(file.filepath);
+      const uploadKey = `products/${Date.now()}_${file.originalFilename}`;
 
-    const s3Result = await s3.send(uploadCommand);
-    const imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${uploadKey}`;
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET_NAME,
+          Key: uploadKey,
+          Body: fileContent,
+          ContentType: file.mimetype,
+        })
+      );
 
-    const tag = (Array.isArray(fields.tag) ? fields.tag[0] : fields.tag)
+      imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/${uploadKey}`;
+
+      // 기존 이미지 삭제
+      if (product.imageUrl) {
+        const deleteKey = product.imageUrl.replace(
+          `https://${process.env.AWS_S3_BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/`,
+          ""
+        );
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.AWS_S3_BUCKET_NAME,
+            Key: deleteKey,
+          })
+        );
+      }
+    }
+
+    // 태그 처리
+    const tag = getSingleValue(fields.tag)
       .split(",")
-      .map((tag) => tag.trim())
-      .filter((tag) => tag.length > 0);
+      .map((t) => t.trim())
+      .filter((t) => t.length > 0);
 
-    const result = await db.collection("products").updateOne(
+    // DB 업데이트
+    await db.collection("products").updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -118,19 +126,14 @@ export async function PUT(req, { params }) {
           category: getSingleValue(fields.category),
           status: getSingleValue(fields.status),
           discount: parseFloat(fields.discount),
-          tag: tag,
+          tag,
           imageUrl,
-          editAt: new Date(),
+          updateAt: new Date(),
         },
       }
     );
 
-    return NextResponse.json(
-      { message: "상품 수정 완료", title: result.title },
-      {
-        status: 200,
-      }
-    );
+    return NextResponse.json({ message: "상품 수정 완료" }, { status: 200 });
   } catch (err) {
     console.error("업로드 실패", err);
     return NextResponse.json({ error: "서버 오류 발생" }, { status: 500 });
