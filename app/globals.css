@@ -694,6 +694,54 @@ input[type="checkbox"]:checked::after {
   transform: rotate(-45deg); /* V자 모양 */
 }
 
+.quantity-box {
+  display: flex;
+  align-items: center;
+  gap: 0; /* flex 사이 간격 제거 */
+}
+
+.quantity-box button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  padding: 0;
+  border-radius: 0;
+  border: 1px solid black;
+  background-color: white;
+  color: black;
+  cursor: pointer;
+
+  font-size: 15px;
+  line-height: 25px; /* 버튼 높이와 같게 */
+}
+
+.quantity-box input {
+  width: 40px;
+  height: 25px;
+  border-radius: 0;
+  border: 1px solid black;
+  margin: 0;
+  padding: 0;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: textfield;
+  box-sizing: border-box;
+  line-height: 25px;
+  text-align: center;
+}
+
+.quantity-box input[type="number"]::-webkit-inner-spin-button,
+.quantity-box input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
+}
+
+input[type="number"]:focus {
+  outline: none;
+}
 @media screen and (max-width: 866px) {
   .up-nav {
     flex-direction: column;

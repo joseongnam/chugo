@@ -8,17 +8,29 @@ export default function Cart() {
   const [selectedIds, setSelectedIds] = useState([]);
 
   const totalPrice = products
-    .filter((product) => selectedIds.includes(product._id))
-    .reduce((acc, product) => acc + product.price, 0);
+    .filter((p) => selectedIds.includes(p._id))
+    .reduce((acc, p) => acc + p.price * (p.quantity || 1), 0);
 
   const totalDiscount = products
-    .filter((product) => selectedIds.includes(product._id))
+    .filter((p) => selectedIds.includes(p._id))
     .reduce(
-      (acc, product) => acc + product.price * (product.discount / 100),
+      (acc, p) => acc + p.price * (p.discount / 100) * (p.quantity || 1),
       0
     );
 
   const totalDiscountPrice = totalPrice - totalDiscount;
+
+  const handleQuantityChange = (id, delta) => {
+    setProducts((prev) =>
+      prev.map((p) => {
+        if (p._id === id) {
+          const newQty = Math.max(1, (p.quantity || 1) + delta);
+          return { ...p, quantity: newQty };
+        }
+        return p;
+      })
+    );
+  };
 
   useEffect(() => {
     const cartIds = JSON.parse(localStorage.getItem("cart") || "[]");
@@ -43,7 +55,8 @@ export default function Cart() {
           }
         })
         .then((data) => {
-          setProducts(data);
+          const dataWithQuantity = data.map((p) => ({ ...p, quantity: 1 }));
+          setProducts(dataWithQuantity);
           setSelectedIds(data.map((p) => p._id));
         })
         .catch((err) => console.error("Fetch 에러:", err));
@@ -103,7 +116,42 @@ export default function Cart() {
                     </div>
                   </div>
 
-                  <div style={{ flex: 10 }}>{data.title}</div>
+                  <div style={{ flex: 10 }}>
+                    <div>{data.title}</div>
+                    <div>{data.price}원</div>
+                    <div>옵션</div>
+                    <div className="quantity-box">
+                      <button
+                        style={{ borderRight: 0 }}
+                        onClick={() => handleQuantityChange(data._id, -1)}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={data.quantity}
+                        onChange={(e) => {
+                          const val = Math.max(
+                            1,
+                            parseInt(e.target.value) || 1
+                          );
+                          setProducts((prev) =>
+                            prev.map((p) =>
+                              p._id === data._id ? { ...p, quantity: val } : p
+                            )
+                          );
+                        }}
+                      />
+                      <button
+                        style={{ borderLeft: 0, margin: 0 }}
+                        onClick={() => handleQuantityChange(data._id, 1)}
+                      >
+                        +
+                      </button>
+
+                      <button style={{ fontSize: 8, width: 40 }}>변경</button>
+                    </div>
+                  </div>
                   <div style={{ flex: 4 }}>
                     <div>
                       <button
