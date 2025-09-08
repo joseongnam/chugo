@@ -20,7 +20,7 @@ const s3 = new S3Client({
   },
 });
 
-export const dynamic = "force-dynamic";
+
 // POST 핸들러 (App Router 방식)
 export async function POST(request) {
   const form = new Formidable({ multiples: false }); // ✅ 최신 버전 방식
