@@ -1,8 +1,11 @@
+export const dynamic = "force-dynamic";
+
 import connectDB from "@/util/database";
 import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
+
 
 export const authOptions = {
   providers: [
