@@ -12,6 +12,7 @@ const s3 = new S3Client({
   },
 });
 
+export const dynamic = "force-dynamic";
 export async function DELETE(req, { params }) {
   const { id } = params;
   try {

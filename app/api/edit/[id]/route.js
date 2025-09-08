@@ -1,5 +1,9 @@
 import connectDB from "@/util/database";
-import { PutObjectCommand, S3Client, DeleteObjectCommand } from "@aws-sdk/client-s3";
+import {
+  DeleteObjectCommand,
+  PutObjectCommand,
+  S3Client,
+} from "@aws-sdk/client-s3";
 import { Formidable } from "formidable";
 import fs from "fs";
 import { ObjectId } from "mongodb";
