@@ -3,7 +3,7 @@ import connectDB from "@/util/database";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-
+export const dynamic = "force-dynamic";
 // POST 핸들러 (App Router 방식)
 export async function GET(request) {
   const db = (await connectDB).db("chugo");

@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
 // POST 핸들러 (App Router 방식)
 export async function POST(request) {
   const { email, password } = await request.json();

@@ -1,6 +1,7 @@
 import connectDB from "@/util/database";
 import bcrypt from "bcrypt";
 
+export const dynamic = "force-dynamic";
 // POST 핸들러 (App Router 방식)
 export async function POST(request) {
   const {
