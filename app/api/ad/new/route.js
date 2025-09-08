@@ -4,6 +4,7 @@ import { Formidable } from "formidable";
 import fs from "fs";
 import { Readable } from "stream";
 
+export const dynamic = "force-dynamic";
 export const config = {
   api: {
     bodyParser: false,

@@ -10,6 +10,7 @@ import { ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 import { Readable } from "stream";
 
+export const dynamic = "force-dynamic";
 export const config = {
   api: {
     bodyParser: false,

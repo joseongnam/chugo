@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
-
+export const dynamic = "force-dynamic";
 export async function GET() {
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;

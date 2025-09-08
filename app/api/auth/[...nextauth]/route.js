@@ -4,6 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
 
+export const dynamic = "force-dynamic";
 export const authOptions = {
   providers: [
     KakaoProvider({
