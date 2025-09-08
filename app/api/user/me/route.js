@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { getServerSession } from "next-auth/next";
 import { cookies } from "next/headers";
-import { authOptions } from "../../auth/[...nextauth]/route.js";
+import { authOptions } from "../../auth/[...nextauth].js";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
