@@ -847,6 +847,132 @@ input[type="number"]:focus {
   padding: 0 20px;
 }
 
+.order-pw-check {
+  background-color: #f4f4f4;
+  width: 100%;
+  margin: 0;
+  padding: 20px;
+}
+
+.pw-check {
+  display: flex;
+}
+
+.pw-check label {
+  font-weight: normal;
+  flex: 2;
+  align-items: center;
+  display: flex;
+}
+
+.pw-check input {
+  flex: 18;
+  border-radius: 0;
+}
+
+.order-pw-check p {
+  margin-left: 10%;
+  font-size: 12px;
+  color: #a6a6a6;
+}
+
+.order-products {
+  display: flex;
+  align-items: center;
+}
+
+.order-products img {
+  width: 100px;
+  height: 100px;
+  flex: 1;
+  object-fit: cover;
+}
+
+.order-products div {
+  flex: 11;
+  padding: 20px;
+  font-size: 12px;
+}
+
+.order-products-delivery {
+  display: flex;
+  background-color: #f4f4f4;
+  padding: 15px 20px;
+  justify-content: space-between;
+}
+
+.all-order-price div {
+  display: flex;
+  justify-content: space-between;
+  padding: 0;
+  margin: 0;
+  align-items: center;
+}
+
+.all-order-price {
+  padding: 20px;
+}
+
+.allPrice {
+  font-weight: bold;
+  font-size: large;
+  background-color: rgb(233, 233, 255);
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  height: 50px;
+}
+
+.allPrice p {
+  margin: 0; /* 기본 margin 제거 */
+  display: flex;
+  align-items: center; /* 세로 가운데 */
+  height: 100%; /* 부모 높이 꽉 채우기 */
+}
+
+.order-blue-btn {
+  background-color: #7948ff;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-weight: bold;
+}
+
+.order-explanation {
+  background-color: #f8f8f8;
+}
+
+.order-blue-btn:hover {
+  cursor: pointer;
+}
+
+.order-payment {
+  margin: 20px;
+  border-bottom: 1px solid #d1d1d1;
+}
+
+.order-payment div {
+  border: 1px solid #d1d1d1;
+  border-bottom: none;
+  padding: 20px;
+  align-items: center;
+  color: #d1d1d1;
+  cursor: pointer;
+}
+
+.pay-active {
+  border: 1px solid blue !important;
+  color: blue !important;
+}
+
+.info-payment {
+  margin: 20px;
+  border: 1px solid #d1d1d1;
+  padding: 20px;
+  background-color: #fdfafa;
+}
+
 @media screen and (max-width: 866px) {
   .up-nav {
     flex-direction: column;

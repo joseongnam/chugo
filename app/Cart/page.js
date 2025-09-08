@@ -78,6 +78,18 @@ export default function Cart() {
     }
   }, [deleteId]);
 
+  const handleOrder = () => {
+    const orderItems = products
+      .filter((p) => selectedIds.includes(p._id))
+      .map((p) => ({
+        id: p._id,
+        quantity: p.quantity,
+      }));
+
+    localStorage.setItem("orderItems", JSON.stringify(orderItems));
+    window.location.href = "/order";
+  };
+
   return (
     <div className="basket">
       <h4 style={{ fontWeight: "bold" }}>장바구니</h4>
@@ -194,7 +206,9 @@ export default function Cart() {
           </div>
           <div style={{ marginTop: "10px", textAlign: "right" }}>
             <button className="white-btn">전체상품주문</button>
-            <button className="blue-btn">선택상품주문</button>
+            <button className="blue-btn" onClick={handleOrder}>
+              선택상품주문
+            </button>
           </div>
         </div>
       </div>
