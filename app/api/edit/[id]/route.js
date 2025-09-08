@@ -26,6 +26,7 @@ const s3 = new S3Client({
 });
 
 // POST 핸들러 (App Router 방식)
+export const dynamic = "force-dynamic";
 export async function PUT(req, { params }) {
   const { id } = await params;
   const db = (await connectDB).db("chugo");

@@ -5,6 +5,7 @@ import { authOptions } from "../../auth/[...nextauth]/route.js";
 
 const SECRET_KEY = process.env.JWT_SECRET;
 
+export const dynamic = "force-dynamic";
 export async function GET() {
   // 1) NextAuth 세션 검사
   const session = await getServerSession(authOptions);
