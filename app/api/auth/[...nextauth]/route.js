@@ -1,4 +1,3 @@
-export const dynamic = "force-dynamic";
 
 import connectDB from "@/util/database";
 import NextAuth from "next-auth";
