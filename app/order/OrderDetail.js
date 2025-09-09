@@ -1,8 +1,10 @@
 "use client";
 
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 export default function OrderDetail({ products }) {
+  const router = useRouter();
   const [items, setItems] = useState([]);
   const pay = [
     "토스",
@@ -22,6 +24,10 @@ export default function OrderDetail({ products }) {
   );
 
   const totalDiscountPrice = totalPrice - totalDiscount;
+
+  const payHandler = () => {
+    router.push("/api/pay/payments");
+  };
 
   useEffect(() => {
     const orderItems = JSON.parse(localStorage.getItem("orderItems") || "[]");
@@ -241,7 +247,12 @@ export default function OrderDetail({ products }) {
             </div>
           </div>
           <div className="order-blue-btn">약관동의 및 결제버튼</div>
-          <div className="order-explanation">
+          <div
+            className="order-explanation"
+            onClick={() => {
+              payHandler;
+            }}
+          >
             <p>-설명</p>
             <p>-설명</p>
           </div>
