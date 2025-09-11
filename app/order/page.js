@@ -10,7 +10,7 @@ export default async function Order() {
     createdAt: item.createdAt ? item.createdAt.toISOString() : null,
     updatedAt: item.updatedAt ? item.updatedAt.toISOString() : null,
   }));
-
+  
   return (
     <div className="order-background order-page">
       <div className="up-nav">

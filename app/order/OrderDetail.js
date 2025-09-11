@@ -29,6 +29,90 @@ export default function OrderDetail({ products }) {
     router.push("/api/pay/payments");
   };
 
+  const [deliveryRequire, setDeliveryRequire] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault(); // 기본 form 제출 막기
+
+    const formData = new FormData(e.target);
+    const body = {
+      name: formData.get("name"),
+      phone1: formData.get("phone1"),
+      phone2: formData.get("phone2"),
+      phone3: formData.get("phone3"),
+      receiver: formData.get("receiver"),
+      zipcode: formData.get("zipcode"),
+      rephone1: formData.get("rephone1"),
+      rephone2: formData.get("rephone2"),
+      rephone3: formData.get("rephone3"),
+      deliveryMessage: formData.get("deliveryMessage"),
+      address1: formData.get("address1"),
+      address2: formData.get("address2"),
+    };
+
+    if (!window.IMP) return;
+    const IMP = window.IMP;
+    IMP.init(process.env.CHANNEL_CODE); // ex) imp12345678
+
+    IMP.request_pay(
+      {
+        pg: "html5_inicis", // PG사
+        pay_method: "card", // 결제수단
+        merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+        name: "테스트 결제",
+        amount: totalDiscountPrice, // 결제 금액
+        buyer_email: "test@example.com",
+        buyer_name: formData.get("name"),
+        buyer_tel: `${formData.get("phone1")}-${formData.get(
+          "phone2"
+        )}-${formData.get("phone3")}`,
+        buyer_addr: `${formData.get("address1")} ${formData.get("address2")}`,
+        buyer_postcode: formData.get("zipcode"),
+      },
+      async (rsp) => {
+        if (rsp.success) {
+          const orderData = {
+            name: formData.get("name"),
+            phone: `${formData.get("phone1")}-${formData.get(
+              "phone2"
+            )}-${formData.get("phone3")}`,
+            receiver: formData.get("receiver"),
+            rephone: `${formData.get("rephone1")}-${formData.get(
+              "rephone2"
+            )}-${formData.get("rephone3")}`,
+            address: `${formData.get("address1")} ${formData.get("address2")}`,
+            zipcode: formData.get("zipcode"),
+            deliveryMessage: formData.get("deliveryMessage"),
+            totalPrice: totalDiscountPrice,
+          };
+
+          const res = await fetch("/api/post/order", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              imp_uid: rsp.imp_uid,
+              merchant_uid: rsp.merchant_uid,
+              orderData,
+            }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+            alert("주문 성공!");
+          } else {
+            alert("실패: " + data.error);
+          }
+        }
+      }
+    );
+
+    await fetch("/api/post/order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  };
+
   useEffect(() => {
     const orderItems = JSON.parse(localStorage.getItem("orderItems") || "[]");
     orderItems.map((prev) => {
@@ -42,10 +126,18 @@ export default function OrderDetail({ products }) {
     });
   }, []);
 
+  useEffect(() => {
+    // iamport script 불러오기
+    const script = document.createElement("script");
+    script.src = "https://cdn.iamport.kr/js/iamport.payment-1.2.0.js";
+    script.async = true;
+    document.body.appendChild(script);
+  }, []);
+
   return (
     <>
       <div className="order-title">주문/결제</div>
-      <form>
+      <form onSubmit={handleSubmit}>
         <div>
           <div className="form-title orderline">
             <div>주문정보</div>
@@ -56,21 +148,21 @@ export default function OrderDetail({ products }) {
               <label>
                 <span>주문자</span> <span className="required">*</span>
               </label>
-              <input type="text" />
+              <input type="text" name="name" />
             </div>
             <div>
               <label>
                 <span>휴대전화</span> <span className="required">*</span>
               </label>
               <div className="phone-row" style={{ flex: 9 }}>
-                <select>
+                <select name="phone1">
                   <option value={"010"}>010</option>
                   <option value={"011"}>011</option>
                 </select>
                 -
-                <input type="text" maxLength={4} />
+                <input type="text" maxLength={4} name="phone2" />
                 -
-                <input type="text" maxLength={4} />
+                <input type="text" maxLength={4} name="phone3" />
               </div>
             </div>
           </div>
@@ -83,11 +175,11 @@ export default function OrderDetail({ products }) {
 
           <div className="radio-row">
             <div>
-              <input type="radio" name="delivery" />
+              <input type="radio" />
               <label htmlFor="">주문자 정보와 동일</label>
             </div>
             <div>
-              <input type="radio" name="delivery" />
+              <input type="radio" />
               <label htmlFor="">새로운 배송지</label>
             </div>
           </div>
@@ -96,24 +188,28 @@ export default function OrderDetail({ products }) {
               <label>
                 <span>받는사람</span> <span className="required">*</span>
               </label>
-              <input type="text" />
+              <input type="text" name="receiver" />
             </div>
             <div>
               <label>
                 <span>주소</span> <span className="required">*</span>
               </label>
               <div className="address">
-                <input type="text" placeholder="우편번호" />
+                <input type="text" placeholder="우편번호" name="zipcode" />
                 <button type="white-btn">주소검색</button>
               </div>
             </div>
             <div>
               <label></label>
-              <input type="text" placeholder="기본주소" />
+              <input type="text" placeholder="기본주소" name="address1" />
             </div>
             <div>
               <label></label>
-              <input type="text" placeholder="나머지주소(선택 입력 가능)" />
+              <input
+                type="text"
+                placeholder="나머지주소(선택 입력 가능)"
+                name="address2"
+              />
             </div>
 
             <div>
@@ -121,31 +217,51 @@ export default function OrderDetail({ products }) {
                 <span>휴대전화</span> <span className="required">*</span>
               </label>
               <div className="phone-row" style={{ flex: 9 }}>
-                <select>
+                <select name="rephone1">
                   <option value={"010"}>010</option>
                   <option value={"011"}>011</option>
                 </select>
                 -
-                <input type="text" maxLength={4} />
+                <input type="text" maxLength={4} name="rephone2" />
                 -
-                <input type="text" maxLength={4} />
+                <input type="text" maxLength={4} name="rephone3" />
               </div>
             </div>
           </div>
           <div className="delivery-require">
             <div className="order-form">
-              <select name="" id="">
-                <option value="">-- 메세지 선택 (선택 사항) --</option>
-                <option value="">배송 전에 미리 연락바랍니다.</option>
-                <option value="">부재 시 경비실에 맡겨주세요.</option>
-                <option value="">부재 시 문 앞에 놓아주세요.</option>
-                <option value="">빠른 배송 부탁드립니다.</option>
-                <option value="">택배함에 보관해 주세요.</option>
-                <option value="">직접 입력</option>
+              <select name="deliveryMessage">
+                <option value="X">-- 메세지 선택 (선택 사항) --</option>
+                <option value="배송 전에 미리 연락바랍니다">
+                  배송 전에 미리 연락바랍니다.
+                </option>
+                <option value="부재 시 경비실에 맡겨주세요">
+                  부재 시 경비실에 맡겨주세요.
+                </option>
+                <option value="부재 시 문 앞에 놓아주세요">
+                  부재 시 문 앞에 놓아주세요.
+                </option>
+                <option value="빠른 배송 부탁드립니다">
+                  빠른 배송 부탁드립니다.
+                </option>
+                <option value="택배함에 보관해 주세요">
+                  택배함에 보관해 주세요.
+                </option>
+                <option
+                  onChange={(e) => {
+                    setDeliveryRequire(e.target.value);
+                  }}
+                >
+                  직접 입력
+                </option>
               </select>
             </div>
             <div className="delivery-hidden">
-              <input type="text" style={{ height: "60px" }} />
+              <input
+                type="text"
+                style={{ height: "60px" }}
+                name="deliveryMessage"
+              />
             </div>
             <div style={{ padding: "20px" }}>
               <div>
@@ -246,7 +362,9 @@ export default function OrderDetail({ products }) {
               </div>
             </div>
           </div>
-          <div className="order-blue-btn">약관동의 및 결제버튼</div>
+          <button type="submit" className="order-blue-btn">
+            약관동의 및 결제버튼
+          </button>
           <div
             className="order-explanation"
             onClick={() => {
