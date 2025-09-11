@@ -52,7 +52,7 @@ export default function OrderDetail({ products }) {
 
     if (!window.IMP) return;
     const IMP = window.IMP;
-    IMP.init(process.env.CHANNEL_CODE); // ex) imp12345678
+    IMP.init("imp44484754"); // ex) imp12345678
 
     IMP.request_pay(
       {
@@ -136,7 +136,7 @@ export default function OrderDetail({ products }) {
     script.onload = () => {
       // 가맹점 식별코드 넣기 (포트원 대시보드에서 확인 가능)
       if (window.IMP) {
-        IMP.init(process.env.CHANNEL_CODE);
+        IMP.init("imp44484754");
       }
     };
   }, []);
