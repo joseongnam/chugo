@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function OrderDetail({ products }) {
-  const router = useRouter();
+  const [deliveryMessage, setDeliveryMessage] = useState("");
   const [items, setItems] = useState([]);
   const pay = [
     "토스",
@@ -31,20 +30,9 @@ export default function OrderDetail({ products }) {
     e.preventDefault(); // 기본 form 제출 막기
 
     const formData = new FormData(e.target);
-    const body = {
-      name: formData.get("name"),
-      phone1: formData.get("phone1"),
-      phone2: formData.get("phone2"),
-      phone3: formData.get("phone3"),
-      receiver: formData.get("receiver"),
-      zipcode: formData.get("zipcode"),
-      rephone1: formData.get("rephone1"),
-      rephone2: formData.get("rephone2"),
-      rephone3: formData.get("rephone3"),
-      deliveryMessage: formData.get("deliveryMessage"),
-      address1: formData.get("address1"),
-      address2: formData.get("address2"),
-    };
+
+    if (!window.IMP) return;
+    const IMP = window.IMP;
 
     IMP.request_pay(
       {
@@ -76,9 +64,10 @@ export default function OrderDetail({ products }) {
             zipcode: formData.get("zipcode"),
             deliveryMessage: formData.get("deliveryMessage"),
             totalPrice: totalDiscountPrice,
+            deliveryMessage: deliveryMessage,
           };
 
-          await fetch("/api/post/order", {
+          const res = await fetch("/api/post/order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -100,14 +89,15 @@ export default function OrderDetail({ products }) {
   };
 
   useEffect(() => {
-    const orderItemsData = orderItems
+    const storedItems = JSON.parse(localStorage.getItem("orderItems") || "[]");
+    const orderItemsData = storedItems
       .map((prev) => {
         const found = products.find((item) => item._id === prev.id);
         return found ? { ...found, quantity: prev.quantity } : null;
       })
       .filter(Boolean);
     setItems(orderItemsData);
-  }, []);
+  }, [products]);
 
   useEffect(() => {
     // 아임포트 스크립트 로드
@@ -186,7 +176,9 @@ export default function OrderDetail({ products }) {
               </label>
               <div className="address">
                 <input type="text" placeholder="우편번호" name="zipcode" />
-                <button type="white-btn">주소검색</button>
+                <button type="button" className="white-btn">
+                  주소검색
+                </button>
               </div>
             </div>
             <div>

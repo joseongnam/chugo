@@ -58,6 +58,7 @@ export async function POST(request) {
       deliveryMessage: orderData.deliveryMessage,
       zipcode: orderData.zipcode,
       address: address,
+      deliveryMessage: orderData.deliveryMessage,
       amount: payment.amount,
       status: "paid",
       createdAt: new Date(),
