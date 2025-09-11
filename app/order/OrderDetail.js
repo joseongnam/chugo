@@ -27,27 +27,62 @@ export default function OrderDetail({ products }) {
   const [deliveryRequire, setDeliveryRequire] = useState("");
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // 기본 form 제출 막기
+    e.preventDefault();
+    console.log("결제 금액:", totalDiscountPrice);
 
     const formData = new FormData(e.target);
+    const name = formData.get("name");
+    const phone1 = formData.get("phone1");
+    const phone2 = formData.get("phone2");
+    const phone3 = formData.get("phone3");
+    const receiver = formData.get("receiver");
+    const rephone1 = formData.get("rephone1");
+    const rephone2 = formData.get("rephone2");
+    const rephone3 = formData.get("rephone3");
+    const zipcode = formData.get("zipcode");
+    const address1 = formData.get("address1");
+    const orderPw = formData.get("orderPw");
+    const orderPwConfirm = formData.get("orderPwConfirm");
+
+    // 필수값 검사
+    if (
+      !name ||
+      !phone1 ||
+      !phone2 ||
+      !phone3 ||
+      !receiver ||
+      !rephone1 ||
+      !rephone2 ||
+      !rephone3 ||
+      !zipcode ||
+      !address1 ||
+      !orderPw ||
+      !orderPwConfirm
+    ) {
+      alert("필수 입력값을 모두 채워주세요.");
+      return;
+    }
+
+    if (orderPw !== orderPwConfirm) {
+      alert("비밀번호와 비밀번호 확인이 일치하지 않습니다.");
+      return;
+    }
 
     if (!window.IMP) return;
     const IMP = window.IMP;
 
     IMP.request_pay(
       {
-        pg: "html5_inicis", // PG사
-        pay_method: "card", // 결제수단
-        merchant_uid: `mid_${new Date().getTime()}`, // 주문번호
+        pg: "html5_inicis",
+        pay_method: "card",
+        merchant_uid: `mid_${new Date().getTime()}`,
         name: "테스트 결제",
-        amount: totalDiscountPrice, // 결제 금액
+        amount: totalDiscountPrice,
         buyer_email: "test@example.com",
-        buyer_name: formData.get("name"),
-        buyer_tel: `${formData.get("phone1")}-${formData.get(
-          "phone2"
-        )}-${formData.get("phone3")}`,
-        buyer_addr: `${formData.get("address1")} ${formData.get("address2")}`,
-        buyer_postcode: formData.get("zipcode"),
+        buyer_name: name, // 수정
+        buyer_tel: `${phone1}-${phone2}-${phone3}`, // 수정
+        buyer_addr: `${address1} ${formData.get("address2")}`,
+        buyer_postcode: zipcode, // 수정
       },
       async (rsp) => {
         if (rsp.success) {
@@ -65,6 +100,8 @@ export default function OrderDetail({ products }) {
             deliveryMessage: formData.get("deliveryMessage"),
             totalPrice: totalDiscountPrice,
             deliveryMessage: deliveryMessage,
+            orderPw: formData.get("orderPw"),
+            orderPwConfirm: formData.get("orderPwConfirm"),
           };
 
           const res = await fetch("/api/post/order", {
@@ -260,14 +297,14 @@ export default function OrderDetail({ products }) {
               <div>
                 <div className="pw-check">
                   <label htmlFor="">비밀번호</label>
-                  <input type="text" />
+                  <input type="text" name="orderPw" />
                 </div>
                 <p>
                   (영문대소문자/숫자/특수문자 중 2가지 이상 조합, 10자~16자)
                 </p>
                 <div className="pw-check">
                   <label htmlFor="">비밀번호 확인</label>
-                  <input type="text" />
+                  <input type="text" name="orderPwConfirm" />
                 </div>
               </div>
             </div>
