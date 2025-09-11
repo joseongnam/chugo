@@ -39,6 +39,12 @@ export async function POST(request) {
     const payment = paymentData.response;
 
     // 3) 결제 검증
+    if (!payment) {
+      return new Response(JSON.stringify({ error: "결제 정보 조회 실패" }), {
+        status: 400,
+      });
+    }
+
     if (payment.status !== "paid") {
       return new Response(JSON.stringify({ error: "결제 실패" }), {
         status: 400,
