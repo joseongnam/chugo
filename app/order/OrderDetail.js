@@ -25,10 +25,6 @@ export default function OrderDetail({ products }) {
 
   const totalDiscountPrice = totalPrice - totalDiscount;
 
-  const payHandler = () => {
-    router.push("/api/pay/payments");
-  };
-
   const [deliveryRequire, setDeliveryRequire] = useState("");
 
   const handleSubmit = async (e) => {
@@ -49,10 +45,6 @@ export default function OrderDetail({ products }) {
       address1: formData.get("address1"),
       address2: formData.get("address2"),
     };
-
-    if (!window.IMP) return;
-    const IMP = window.IMP;
-    IMP.init("imp44484754"); // ex) imp12345678
 
     IMP.request_pay(
       {
@@ -86,7 +78,7 @@ export default function OrderDetail({ products }) {
             totalPrice: totalDiscountPrice,
           };
 
-          const res = await fetch("/api/post/order", {
+          await fetch("/api/post/order", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -105,25 +97,16 @@ export default function OrderDetail({ products }) {
         }
       }
     );
-
-    await fetch("/api/post/order", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
   };
 
   useEffect(() => {
-    const orderItems = JSON.parse(localStorage.getItem("orderItems") || "[]");
-    orderItems.map((prev) => {
-      const found = products.find((item) => item._id === prev.id);
-      if (found) {
-        setItems((prevItems) => [
-          ...prevItems,
-          { ...found, quantity: prev.quantity },
-        ]);
-      }
-    });
+    const orderItemsData = orderItems
+      .map((prev) => {
+        const found = products.find((item) => item._id === prev.id);
+        return found ? { ...found, quantity: prev.quantity } : null;
+      })
+      .filter(Boolean);
+    setItems(orderItemsData);
   }, []);
 
   useEffect(() => {
@@ -237,7 +220,10 @@ export default function OrderDetail({ products }) {
           </div>
           <div className="delivery-require">
             <div className="order-form">
-              <select name="deliveryMessage">
+              <select
+                name="deliveryMessage"
+                onChange={(e) => setDeliveryMessage(e.target.value)}
+              >
                 <option value="X">-- 메세지 선택 (선택 사항) --</option>
                 <option value="배송 전에 미리 연락바랍니다">
                   배송 전에 미리 연락바랍니다.
@@ -254,13 +240,7 @@ export default function OrderDetail({ products }) {
                 <option value="택배함에 보관해 주세요">
                   택배함에 보관해 주세요.
                 </option>
-                <option
-                  onChange={(e) => {
-                    setDeliveryRequire(e.target.value);
-                  }}
-                >
-                  직접 입력
-                </option>
+                <option value="direct">직접 입력</option>
               </select>
             </div>
             <div className="delivery-hidden">
@@ -268,6 +248,7 @@ export default function OrderDetail({ products }) {
                 type="text"
                 style={{ height: "60px" }}
                 name="deliveryMessage"
+                onChange={(e) => setDeliveryMessage(e.target.value)}
               />
             </div>
             <div style={{ padding: "20px" }}>
@@ -372,12 +353,7 @@ export default function OrderDetail({ products }) {
           <button type="submit" className="order-blue-btn">
             약관동의 및 결제버튼
           </button>
-          <div
-            className="order-explanation"
-            onClick={() => {
-              payHandler;
-            }}
-          >
+          <div className="order-explanation">
             <p>-설명</p>
             <p>-설명</p>
           </div>

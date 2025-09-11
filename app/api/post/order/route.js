@@ -2,26 +2,10 @@ import connectDB from "@/util/database";
 
 // POST 핸들러 (App Router 방식)
 export async function POST(request) {
-  const {
-    name,
-    phone1,
-    phone2,
-    phone3,
-    receiver,
-    address1,
-    address2,
-    zipcode,
-    rephone1,
-    rephone2,
-    rephone3,
-    deliveryMessage,
-    imp_uid,
-    merchant_uid,
-    orderData
-  } = await request.json();
-  const phone = `${phone1}-${phone2}-${phone3}`;
-  const rephone = `${rephone1}-${rephone2}-${rephone3}`;
-  const address = `${address1} ${address2}`;
+  const { imp_uid, merchant_uid, orderData } = await request.json();
+  const phone = `${orderData.phone1}-${orderData.phone2}-${orderData.phone3}`;
+  const rephone = `${orderData.rephone1}-${orderData.rephone2}-${orderData.rephone3}`;
+  const address = `${orderData.address1} ${orderData.address2}`;
   const db = (await connectDB).db("chugo");
 
   try {
@@ -39,7 +23,9 @@ export async function POST(request) {
         imp_secret: process.env.IMP_SECRET,
       }),
     });
-    const { response: token } = await tokenRes.json();
+    const tokenData = await tokenRes.json();
+    if (!tokenData.response) throw new Error("Iamport 토큰 발급 실패");
+    const token = tokenData.response;
 
     // 2) 결제 내역 조회
     const paymentRes = await fetch(
@@ -48,23 +34,29 @@ export async function POST(request) {
         headers: { Authorization: token.access_token },
       }
     );
-    const { response: payment } = await paymentRes.json();
+    const paymentData = await paymentRes.json();
+    if (!paymentData.response) throw new Error("결제 조회 실패");
+    const payment = paymentData.response;
 
     // 3) 결제 검증
     if (payment.status !== "paid") {
-      return NextResponse.json({ error: "결제 실패" }, { status: 400 });
+      return new Response(JSON.stringify({ error: "결제 실패" }), {
+        status: 400,
+      });
     }
     if (payment.amount !== orderData.totalPrice) {
-      return NextResponse.json({ error: "금액 불일치" }, { status: 400 });
+      return new Response(JSON.stringify({ error: "금액 불일치" }), {
+        status: 400,
+      });
     }
 
     const result = await db.collection("order").insertOne({
-      name: name,
+      name: orderData.name,
       phone: phone,
-      receiver: receiver,
+      receiver: orderData.receiver,
       rephone: rephone,
-      deliveryMessage: deliveryMessage,
-      zipcode: zipcode,
+      deliveryMessage: orderData.deliveryMessage,
+      zipcode: orderData.zipcode,
       address: address,
       amount: payment.amount,
       status: "paid",
@@ -80,8 +72,11 @@ export async function POST(request) {
     );
   } catch (err) {
     console.error("주문 실패", err);
-    return new Response(JSON.stringify({ error: "서버 오류 발생" }), {
-      status: 500,
-    });
+    return new Response(
+      JSON.stringify({ error: err.message || "서버 오류 발생" }),
+      {
+        status: 500,
+      }
+    );
   }
 }
