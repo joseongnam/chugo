@@ -29,6 +29,9 @@ export default function OrderDetail({ products }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("결제 금액:", totalDiscountPrice);
+    console.log(window.IMP);
+    console.log(e.target);
+    console.log(name);
 
     const formData = new FormData(e.target);
     const name = formData.get("name");
