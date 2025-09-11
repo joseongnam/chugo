@@ -31,7 +31,6 @@ export default function OrderDetail({ products }) {
     console.log("결제 금액:", totalDiscountPrice);
     console.log(window.IMP);
     console.log(e.target);
-    console.log(name);
 
     const formData = new FormData(e.target);
     const name = formData.get("name");
@@ -47,6 +46,7 @@ export default function OrderDetail({ products }) {
     const orderPw = formData.get("orderPw");
     const orderPwConfirm = formData.get("orderPwConfirm");
 
+    console.log(name);
     // 필수값 검사
     if (
       !name ||
