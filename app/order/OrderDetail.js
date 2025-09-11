@@ -127,11 +127,18 @@ export default function OrderDetail({ products }) {
   }, []);
 
   useEffect(() => {
-    // iamport script 불러오기
+    // 아임포트 스크립트 로드
     const script = document.createElement("script");
     script.src = "https://cdn.iamport.kr/js/iamport.payment-1.2.0.js";
     script.async = true;
     document.body.appendChild(script);
+
+    script.onload = () => {
+      // 가맹점 식별코드 넣기 (포트원 대시보드에서 확인 가능)
+      if (window.IMP) {
+        IMP.init(process.env.CHANNEL_CODE);
+      }
+    };
   }, []);
 
   return (
