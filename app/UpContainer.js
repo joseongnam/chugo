@@ -112,7 +112,14 @@ export default function UpContainer() {
             <li>모든상품</li>
             <li>리뷰</li>
             <li>이벤트</li>
-            <li onClick={() => router.push("/customerservice")}>고객센터</li>
+            <li
+              onClick={() => {
+                router.push("/customerservice");
+                setView(false);
+              }}
+            >
+              고객센터
+            </li>
           </ul>
           {isMobile ? (
             <button

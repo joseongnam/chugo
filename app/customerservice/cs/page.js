@@ -76,7 +76,14 @@ export default function Cs() {
             {filteredList.map((data, index) => (
               <tr key={index}>
                 <td>{List.length - index}</td>
-                <td className="td-title">{data.title}</td>
+                <td
+                  className="td-title"
+                  onClick={() => {
+                    router.push(`/customerservice/cs/detail/${data._id}`);
+                  }}
+                >
+                  {data.title}
+                </td>
                 <td>{data.date}</td>
                 <td>{data.email}</td>
                 <td>100</td>

@@ -1160,6 +1160,41 @@ td {
   justify-content: flex-end;
 }
 
+.detail-all {
+  border: 1px solid #919191;
+  padding: 20px;
+  margin: 20px 0px;
+  border-radius: 5px;
+}
+
+.detail-up {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.detail-up div {
+  border: 1px solid #919191;
+}
+
+.detail-up :nth-child(1) {
+  width: 50%;
+}
+
+.detail-content {
+  border: 1px solid #919191;
+  min-height: 150px;
+}
+
+.detail-end {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+}
+
+.detail-end button {
+  margin: 0;
+}
 
 @media screen and (max-width: 866px) {
   .up-nav {
