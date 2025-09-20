@@ -1,10 +1,9 @@
-
 import connectDB from "@/util/database";
 import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import KakaoProvider from "next-auth/providers/kakao";
 import NaverProvider from "next-auth/providers/naver";
-
 
 export const authOptions = {
   providers: [
@@ -65,63 +64,88 @@ export const authOptions = {
         },
       },
     }),
+    CredentialsProvider({
+      name: "credentials",
+      async authorize(credentials) {
+        // 이 부분에서 직접 만든 JWT 로그인 API를 호출하거나,
+        // 기존 JWT 로그인 API의 인증 로직을 그대로 가져와서 사용
+        const { identifier, password } = credentials;
+        const db = (await connectDB).db("chugo");
+        const user = await db.collection("user").findOne({
+          $or: [{ email: identifier }, { id: identifier }],
+        });
+
+          if (!user) {
+          return null; // 사용자를 찾을 수 없음
+        }
+
+        if (user && (await bcrypt.compare(password, user.password))) {
+          // 인증 성공 시 사용자 정보 반환
+          return {
+            id: user._id.toString(),
+            name: user.name,
+            email: user.email,
+          };
+        }
+        return null; // 인증 실패 시 null 반환
+      },
+    }),
   ],
+
   secret: process.env.NEXTAUTH_SECRET,
   callbacks: {
     async signIn({ user, account }) {
-      // user: { name, email, image, id }
-      const userEmail =
-        user.email || `${account.provider}_${user.id}@example.com`;
-      try {
-        const db = (await connectDB).db("chugo");
-        const emailToUse = user.email || userEmail;
-        const existingUser = await db
-          .collection("user")
-          .findOne({ email: emailToUse });
-
-        if (!existingUser) {
-          // 회원정보 새로 생성
-          await db.collection("user").insertOne({
-            id: user.id,
-            name: user.name,
-            email: emailToUse,
-            image: user.image || null,
-            provider: account.provider,
-            phone: user.phone || null,
-            yymmdd: user.year || null,
-            zipcode: null,
-            isAdmin: "false",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          });
-        } else {
-          // 기존 회원 업데이트 (예: 프로필 이미지 변경)
-          await db.collection("user").updateOne(
-            { email: emailToUse },
-            {
-              $set: {
-                name: user.name,
-                image: user.image,
-                updatedAt: new Date(),
-              },
-            }
-          );
+      // 소셜 로그인인 경우에만 실행되도록 수정
+      if (account.provider !== 'credentials') {
+        const userEmail = user.email || `${account.provider}_${user.id}@example.com`;
+        try {
+          const db = (await connectDB).db("chugo");
+          const existingUser = await db.collection("user").findOne({ email: userEmail });
+          
+          if (!existingUser) {
+            await db.collection("user").insertOne({
+              id: user.id,
+              name: user.name,
+              email: userEmail,
+              image: user.image || null,
+              provider: account.provider,
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+          } else {
+            await db.collection("user").updateOne(
+              { email: userEmail },
+              { $set: { name: user.name, image: user.image, updatedAt: new Date() } }
+            );
+          }
+          return true;
+        } catch (error) {
+          console.error("signIn 콜백 DB 에러:", error);
+          return false;
         }
-        return true; // 로그인 계속 진행
-      } catch (error) {
-        console.error("signIn 콜백 DB 에러:", error);
-        return false; // 로그인 실패 처리
       }
+      return true; // CredentialsProvider는 여기서 그냥 true 반환
     },
 
-    async jwt({ token, account, profile }) {
+    async jwt({ token, user, account, profile }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+      }
       if (account) {
         token.accessToken = account.access_token;
       }
       return token;
     },
+
     async session({ session, token }) {
-      session.accessToken = token.accessToken;
+      if (token) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.accessToken = token.accessToken;
+      }
       return session;
     },
   },

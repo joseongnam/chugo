@@ -6,21 +6,21 @@ import { useState } from "react";
 import { useUser } from "../UserContext";
 
 export default function Login() {
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [saveId, setSaveId] = useState(false);
   const router = useRouter();
   const { setUser } = useUser();
 
-    const handleSocialLogin = (provider) => {
+  const handleSocialLogin = (provider) => {
     signIn(provider, { callbackUrl: "/" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const loginData = {
-      email: email,
+      identifier: identifier,
       password: password,
     };
     try {
@@ -83,8 +83,8 @@ export default function Login() {
             className="login-input"
             type="text"
             placeholder="아이디 또는 이메일"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
           />
           <input
             className="login-input"

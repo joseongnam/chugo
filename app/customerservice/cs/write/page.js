@@ -13,6 +13,7 @@ export default function Write() {
         <input name="title" placeholder="글제목" className="write-title" />
         <input name="content" placeholder="글내용" className="write-content" />
         <input type="hidden" name="email" value={user.email} />
+        <input type="hidden" name="name" value={user.name} />
         <button type="submit" className="write-page-btn">
           전송
         </button>

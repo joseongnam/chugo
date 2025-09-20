@@ -1196,6 +1196,56 @@ td {
   margin: 0;
 }
 
+.qna-title {
+  text-align: center;
+  font-size: 30px;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.qna-back {
+  padding: 30px;
+}
+
+.comment {
+  display: flex;
+  margin: 10px 0;
+}
+
+.comment :nth-child(1) {
+  flex: 1;
+}
+
+.comment :nth-child(2) {
+  flex: 6;
+}
+
+.comment :nth-child(3) {
+  flex: 2;
+}
+
+.comment :nth-child(4) {
+  flex: 1;
+}
+
+.comment-input {
+  display: flex;
+}
+
+.comment-input input {
+  flex: 8;
+}
+
+.comment-input button {
+  flex: 1;
+  border: 1px solid #919191;
+}
+
+.comment-input button:hover {
+  background-color: #919191;
+  color: white;
+}
+
 @media screen and (max-width: 866px) {
   .up-nav {
     align-items: center;

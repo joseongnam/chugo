@@ -3,14 +3,13 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { NextResponse } from "next/server";
 
-
 // POST 핸들러 (App Router 방식)
 export async function POST(request) {
-  const { email, password } = await request.json();
+  const { identifier, password } = await request.json();
   const db = (await connectDB).db("chugo");
   const user = await db
     .collection("user")
-    .findOne({ $or: [{ email: email }, { id: email }] });
+    .findOne({ $or: [{ email: identifier }, { id: identifier }] });
   const isMatch = await bcrypt.compare(password, user.password);
 
   try {

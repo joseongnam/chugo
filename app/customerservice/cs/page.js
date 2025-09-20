@@ -1,5 +1,6 @@
 "use client";
 
+import { views } from "@/app/actions";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -7,19 +8,29 @@ export default function Cs() {
   const [List, setList] = useState([]);
   const [searchInput, setSearchInput] = useState(""); // input 값
   const [filteredList, setFilteredList] = useState([]);
-
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(0);
+  const [limit, setLimit] = useState(5);
+  const pageNumbers = Array.from({ length: totalPages }, (_, i) => i + 1);
+  const [totalWrite, setTotalWrite] = useState(0);
   const router = useRouter();
+  const [totalComment, setTotalComment] = useState(0);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         // ✅ try...catch 블록으로 에러 처리
-        const response = await fetch("/api/cs/list");
+        const response = await fetch(
+          `/api/cs/list?page=${page}&limit=${limit}`
+        );
         if (!response.ok) {
           throw new Error("네트워크 응답이 올바르지 않습니다.");
         }
         const data = await response.json();
-        setList(data.data.reverse());
-        setFilteredList(data.data.reverse());
+        setList(data.data);
+        setFilteredList(data.data);
+        setTotalPages(data.totalPages);
+        setTotalWrite(data.totalWrite);
       } catch (error) {
         console.error("데이터를 불러오는 중 오류 발생:", error);
         setList([]);
@@ -27,7 +38,7 @@ export default function Cs() {
       }
     };
     fetchData();
-  }, []);
+  }, [page]);
   console.log(List);
 
   const handleSearch = () => {
@@ -38,6 +49,12 @@ export default function Cs() {
     }
     const result = List.filter((item) => item.title.includes(keyword));
     setFilteredList(result);
+  };
+
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter") {
+      handleSearch();
+    }
   };
 
   return (
@@ -58,6 +75,7 @@ export default function Cs() {
             <input
               type="text"
               onChange={(e) => setSearchInput(e.target.value)}
+              onKeyDown={handleKeyDown}
             />
             <button onClick={handleSearch}>검색</button>
           </div>
@@ -73,36 +91,73 @@ export default function Cs() {
             </tr>
           </thead>
           <tbody>
-            {filteredList.map((data, index) => (
-              <tr key={index}>
-                <td>{List.length - index}</td>
-                <td
-                  className="td-title"
-                  onClick={() => {
-                    router.push(`/customerservice/cs/detail/${data._id}`);
-                  }}
-                >
-                  {data.title}
-                </td>
-                <td>{data.date}</td>
-                <td>{data.email}</td>
-                <td>100</td>
-              </tr>
-            ))}
+            {filteredList.map((data, index) => {
+              const number = totalWrite - ((page - 1) * limit + index);
+              return (
+                <tr key={index}>
+                  <td>{number}</td>
+                  <td
+                    className="td-title"
+                    onClick={() => {
+                      router.push(`/customerservice/cs/detail/${data._id}`);
+                      views(data._id);
+                    }}
+                  >
+                    {data.title}
+                    {data.totalComment === 0 ? "" : ` (${data.totalComment})`}
+                  </td>
+                  <td>{data.date}</td>
+                  <td>{data.name}</td>
+                  <td>{data.views}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
         <div className="cs-end">
           <div>
-            <button>첫페이지</button>
+            <button
+              onClick={() => {
+                setPage(1);
+              }}
+            >
+              첫페이지
+            </button>
           </div>
           <div className="page-number">
-            <button>&lt;</button>
-            <button>1</button>
-            <button>2</button>
-            <button>&gt;</button>
+            <button
+              onClick={() => {
+                setPage(page - 1);
+              }}
+            >
+              &lt;
+            </button>
+            {pageNumbers.map((a, i) => (
+              <button
+                key={i}
+                onClick={() => {
+                  setPage(a);
+                }}
+              >
+                {a}
+              </button>
+            ))}
+            <button
+              onClick={() => {
+                setPage(page + 1);
+              }}
+            >
+              &gt;
+            </button>
           </div>
           <div>
-            <button>마지막페이지</button>
+            <button
+              onClick={() => {
+                setPage(totalPages);
+              }}
+            >
+              마지막페이지
+            </button>
           </div>
         </div>
       </div>
