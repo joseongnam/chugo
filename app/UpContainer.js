@@ -2,11 +2,17 @@
 
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { GiHamburgerMenu } from "react-icons/gi";
 import { useUser } from "./UserContext";
+import useWindowSize from "./customhook/UseWindowSize";
 
 export default function UpContainer() {
   const { user, setUser } = useUser();
   const router = useRouter();
+  const [view, setView] = useState(false);
+  const { width } = useWindowSize();
+  const isMobile = width !== undefined && width < 866; // 768px 미만이면 모바일로 간주
 
   const checkAdmin = async () => {
     try {
@@ -85,18 +91,39 @@ export default function UpContainer() {
       <div className="top-banner">
         <a href="/">이달의 리뷰왕</a>
       </div>
+
       <div className="up-nav">
+        {isMobile ? (
+          <div className="hamburger-menu" onClick={() => setView(!view)}>
+            {view ? "" : <GiHamburgerMenu />}
+          </div>
+        ) : null}
         <div className="logo" onClick={() => router.push("/")}>
           CHUGO
         </div>
-        <div className="middle-nav">
+        <div
+          className={
+            !isMobile ? "middle-nav" : `left-nav ${view ? "show" : ""}`
+          }
+        >
           <ul>
+            {isMobile ? <a href="/login">로그인</a> : null}
             <li>요고특가</li>
             <li>모든상품</li>
             <li>리뷰</li>
             <li>이벤트</li>
-            <li>고객센터</li>
+            <li onClick={() => router.push("/customerservice")}>고객센터</li>
           </ul>
+          {isMobile ? (
+            <button
+              className="close-btn"
+              onClick={() => {
+                setView(false);
+              }}
+            >
+              &lt;
+            </button>
+          ) : null}
         </div>
         <div className="right-nav">
           {user ? (
@@ -104,11 +131,13 @@ export default function UpContainer() {
               <span onClick={checkAdmin}>{user.name} 님</span>
               <span onClick={handleLogout}>로그아웃</span>
             </>
-          ) : (
+          ) : !isMobile ? (
             <>
               <a href="/login">로그인</a>
               <a href="/join">회원가입</a>
             </>
+          ) : (
+            ""
           )}
 
           <a href="/">
