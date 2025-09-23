@@ -110,7 +110,7 @@ export default function UpContainer() {
             {isMobile ? <a href="/login">로그인</a> : null}
             <li
               onClick={() => {
-                router.push("/saleProducts");
+                router.push("/saleproducts");
               }}
             >
               요고특가

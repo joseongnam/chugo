@@ -11,7 +11,7 @@ export default async function Detail({ params }) {
   const db = (await connectDB).db("chugo");
   const data = await db.collection("cs").findOne({ _id: new ObjectId(id) });
   const user = await db.collection("user").findOne({ email: data.userEmail });
-  const session = await getServerSession(authOptions);
+  const session = await (authOptions);
   if (!session) {
     console.log("로그인되지 않은 사용자입니다.");
   }
