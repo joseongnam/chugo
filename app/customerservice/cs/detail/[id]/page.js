@@ -3,6 +3,7 @@ import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import connectDB from "@/util/database";
 import { ObjectId } from "mongodb";
 import { getServerSession } from "next-auth";
+import { cookies } from "next/headers";
 import DetailBtn from "./DetailBtn";
 
 export default async function Detail({ params }) {
@@ -17,8 +18,12 @@ export default async function Detail({ params }) {
   const userName = session?.user?.name || "손님";
   const userEmail = session?.user?.email || "없음";
 
-  const commentList = await db.collection("comment").find().toArray();
+  const commentList = await db
+    .collection("comment")
+    .find({ postId: id })
+    .toArray();
   console.log(commentList);
+  console.log(await cookies().getAll());
   return (
     <div className="cs-container table">
       <div className="detail-all">

@@ -1,4 +1,5 @@
 import connectDB from "@/util/database";
+import bcrypt from "bcrypt";
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
@@ -75,33 +76,51 @@ export const authOptions = {
           $or: [{ email: identifier }, { id: identifier }],
         });
 
-          if (!user) {
+        if (!user) {
           return null; // 사용자를 찾을 수 없음
         }
 
-        if (user && (await bcrypt.compare(password, user.password))) {
-          // 인증 성공 시 사용자 정보 반환
-          return {
-            id: user._id.toString(),
-            name: user.name,
-            email: user.email,
-          };
-        }
-        return null; // 인증 실패 시 null 반환
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) return null;
+
+        return {
+          id: user._id.toString(),
+          name: user.name,
+          email: user.email,
+          isAdmin: user.isAdmin,
+        };
       },
     }),
   ],
 
   secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax", // 또는 "none" (CORS 환경이면)
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
+
   callbacks: {
     async signIn({ user, account }) {
       // 소셜 로그인인 경우에만 실행되도록 수정
-      if (account.provider !== 'credentials') {
-        const userEmail = user.email || `${account.provider}_${user.id}@example.com`;
+      if (account.provider !== "credentials") {
+        const userEmail =
+          user.email || `${account.provider}_${user.id}@example.com`;
         try {
           const db = (await connectDB).db("chugo");
-          const existingUser = await db.collection("user").findOne({ email: userEmail });
-          
+          const existingUser = await db
+            .collection("user")
+            .findOne({ email: userEmail });
+
           if (!existingUser) {
             await db.collection("user").insertOne({
               id: user.id,
@@ -115,7 +134,13 @@ export const authOptions = {
           } else {
             await db.collection("user").updateOne(
               { email: userEmail },
-              { $set: { name: user.name, image: user.image, updatedAt: new Date() } }
+              {
+                $set: {
+                  name: user.name,
+                  image: user.image,
+                  updatedAt: new Date(),
+                },
+              }
             );
           }
           return true;
@@ -127,15 +152,14 @@ export const authOptions = {
       return true; // CredentialsProvider는 여기서 그냥 true 반환
     },
 
-    async jwt({ token, user, account, profile }) {
+    async jwt({ token, user }) {
       if (user) {
-        token.id = user.id;
+        token.id = user.id || user.sub;
         token.name = user.name;
         token.email = user.email;
+        token.isAdmin = user.isAdmin;
       }
-      if (account) {
-        token.accessToken = account.access_token;
-      }
+
       return token;
     },
 
@@ -144,7 +168,7 @@ export const authOptions = {
         session.user.id = token.id;
         session.user.name = token.name;
         session.user.email = token.email;
-        session.accessToken = token.accessToken;
+        session.user.isAdmin = token.isAdmin;
       }
       return session;
     },

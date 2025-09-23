@@ -16,7 +16,7 @@ export async function GET() {
 
   // 2) NextAuth 세션 없으면 기존 JWT 토큰 검사
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value;
+  const token = cookieStore.get("next-auth.session-token")?.value;
   if (!token) {
     return new Response(JSON.stringify({ message: "Unauthorized" }), {
       status: 401,

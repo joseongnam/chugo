@@ -14,27 +14,27 @@ export default function UpContainer() {
   const { width } = useWindowSize();
   const isMobile = width !== undefined && width < 866; // 768px 미만이면 모바일로 간주
 
-  const checkAdmin = async () => {
-    try {
-      const res = await fetch("/api/user/admin", {
-        method: "GET",
-        credentials: "include",
-      });
+  // const checkAdmin = async () => {
+  //   try {
+  //     const res = await fetch("/api/user/admin", {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.message || "관리자 권한 없음");
-      }
+  //     if (!res.ok) {
+  //       const errData = await res.json().catch(() => ({}));
+  //       throw new Error(errData.message || "관리자 권한 없음");
+  //     }
 
-      const data = await res.json();
-      console.log(data);
-      router.push(data.result ? "/admindashboard" : "/");
-    } catch (err) {
-      console.error(err.message);
-      alert(err.message);
-      router.push("/");
-    }
-  };
+  //     const data = await res.json();
+  //     console.log(data);
+  //     router.push(data.result ? "/admindashboard" : "/");
+  //   } catch (err) {
+  //     console.error(err.message);
+  //     alert(err.message);
+  //     router.push("/");
+  //   }
+  // };
 
   const handleLogout = async () => {
     try {
@@ -108,7 +108,13 @@ export default function UpContainer() {
         >
           <ul>
             {isMobile ? <a href="/login">로그인</a> : null}
-            <li>요고특가</li>
+            <li
+              onClick={() => {
+                router.push("/saleProducts");
+              }}
+            >
+              요고특가
+            </li>
             <li>모든상품</li>
             <li>리뷰</li>
             <li>이벤트</li>
@@ -135,7 +141,17 @@ export default function UpContainer() {
         <div className="right-nav">
           {user ? (
             <>
-              <span onClick={checkAdmin}>{user.name} 님</span>
+              <span
+                onClick={() => {
+                  if (user.isAdmin) {
+                    router.push("/admindashboard");
+                  } else {
+                    alert("관리자만 접근 가능합니다");
+                  }
+                }}
+              >
+                {user.name} 님
+              </span>
               <span onClick={handleLogout}>로그아웃</span>
             </>
           ) : !isMobile ? (

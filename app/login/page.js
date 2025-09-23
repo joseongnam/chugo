@@ -13,37 +13,53 @@ export default function Login() {
   const router = useRouter();
   const { setUser } = useUser();
 
-  const handleSocialLogin = (provider) => {
-    signIn(provider, { callbackUrl: "/" });
+  const handleSocialLogin = async (provider) => {
+    await signIn(provider, { callbackUrl: "/" });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const loginData = {
-      identifier: identifier,
-      password: password,
-    };
-    try {
-      const response = await fetch("/api/user/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(loginData),
-        credentials: "include",
-      });
-      const result = await response.json();
-      if (response.ok) {
-        alert(result.message);
-        setUser(result.user);
-        setTimeout(() => router.push("/"), 300);
-      } else {
-        alert(result.message);
-      }
-    } catch (e) {
-      alert("회원가입 정보가 없습니다" + e.message);
+
+    const result = await signIn("credentials", {
+      redirect: true,
+      callbackUrl: "/",
+      identifier,
+      password,
+    });
+
+    if (!result.ok) {
+      alert("로그인 실패: 아이디 또는 비밀번호를 확인하세요.");
     }
   };
+
+  // 기존 로그인 방식
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   const loginData = {
+  //     identifier: identifier,
+  //     password: password,
+  //   };
+  //   try {
+  //     const response = await fetch("/api/user/login", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify(loginData),
+  //       credentials: "include",
+  //     });
+  //     const result = await response.json();
+  //     if (response.ok) {
+  //       alert(result.message);
+  //       setUser(result.user);
+  //       setTimeout(() => router.push("/"), 300);
+  //     } else {
+  //       alert(result.message);
+  //     }
+  //   } catch (e) {
+  //     alert("회원가입 정보가 없습니다" + e.message);
+  //   }
+  // };
 
   return (
     <div className="login-container">

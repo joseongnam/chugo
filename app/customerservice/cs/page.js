@@ -94,7 +94,7 @@ export default function Cs() {
             {filteredList.map((data, index) => {
               const number = totalWrite - ((page - 1) * limit + index);
               return (
-                <tr key={index}>
+                <tr key={index} className="write-tr">
                   <td>{number}</td>
                   <td
                     className="td-title"

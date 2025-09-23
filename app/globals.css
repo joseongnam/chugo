@@ -1045,6 +1045,14 @@ td {
   padding: 50px;
 }
 
+.write-tr {
+  cursor: pointer;
+}
+
+.write-tr:hover {
+  background-color: #f1f1f1;
+}
+
 .table div {
   max-width: 1200px;
 }
@@ -1184,6 +1192,7 @@ td {
 .detail-content {
   border: 1px solid #919191;
   min-height: 150px;
+  padding: 10px;
 }
 
 .detail-end {
@@ -1277,6 +1286,7 @@ td {
     margin-top: 15px;
     font-size: 20px;
     margin-left: 20px;
+    cursor: pointer;
   }
   .top-banner {
     height: 25px;
